@@ -807,6 +807,9 @@
     var hasResponse = typeof $response !== "undefined" && $response != null;
     var hasRequest = typeof $request !== "undefined" && $request != null;
 
+    // 诊断：标记脚本已被 Loon 触发（无条件打印，方便定位"脚本没跑"还是"跑了没改"）
+    try { console.log("[LocSpoof] script triggered, hasResponse=" + hasResponse + ", hasRequest=" + hasRequest); } catch (e) {}
+
     if (!hasResponse && !hasRequest) {
       return;
     }
@@ -816,6 +819,7 @@
 
     // 判断客户端：Loon 有 $loon 全局对象，回写 body 用顶层字段；Shadowrocket 用 {response:{...}} 包裹
     var isLoonRuntime = typeof $loon !== "undefined";
+    try { console.log("[LocSpoof] isLoon=" + isLoonRuntime + ", argument=" + (typeof $argument === "string" ? $argument : "(none)") + ", configUrl=" + (config.configUrl || "(none)") + ", target=" + config.latitude + "," + config.longitude); } catch (e) {}
 
     function passThrough() {
       $done({});
@@ -841,20 +845,18 @@
     function processRewrite(activeConfig) {
       try {
         var rawBody = ByteUtils.toUint8Array(($response && $response.body != null) ? $response.body : ($response && $response.bodyBytes));
+        try { console.log("[LocSpoof] body type=" + (typeof ($response && $response.body)) + ", bytes=" + (rawBody ? rawBody.length : 0) + ", status=" + ($response && $response.status)); } catch (e) {}
         if (!rawBody || rawBody.length < 2) {
+          try { console.log("[LocSpoof] empty body -> passthrough"); } catch (e) {}
           passThrough();
           return;
         }
 
         var result = spoofAppleResponse(rawBody, activeConfig);
-        if (activeConfig.debug) {
-          console.log("[Location Spoofer] Patched " + result.wifiCount + " Wi-Fi, " + result.cellCount + " Cell. Format: " + result.kind);
-        }
+        try { console.log("[LocSpoof] PATCHED kind=" + result.kind + ", wifi=" + result.wifiCount + ", cell=" + result.cellCount); } catch (e) {}
         completeResponse(result.response, result.wifiCount, result.cellCount);
       } catch (err) {
-        if (activeConfig.debug) {
-          console.log("[Location Spoofer] Failed: " + err.message);
-        }
+        try { console.log("[LocSpoof] FAILED: " + err.message); } catch (e) {}
         if (activeConfig.failOpen) {
           passThrough();
         } else {
