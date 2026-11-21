@@ -1029,10 +1029,10 @@ html.dark #search-results::-webkit-scrollbar-thumb {
       <button class="config-action-btn" id="btn-config-copy-arg">复制 argument 参数</button>
     </div>
     <div class="config-section">
-      <div class="config-title">🦉 Loon 用户（本适配版）</div>
-      <div class="config-desc">Loon 不支持小火箭的 sgmodule 格式。点击下方复制 Loon 配置链接，在 Loon 中打开后把内容导入到配置：脚本会自动远程加载改写脚本，MITM 域名也会自动加好。之后开启 Loon 的 HTTPS 解密并信任 CA 证书即可。</div>
+      <div class="config-title">🦉 Loon 用户（原生引擎版）</div>
+      <div class="config-desc">复制下方插件订阅地址，在 Loon 中打开【设置 → 插件 → 添加插件】粘贴导入。这是原生 Loon 插件（含 Prepare 请求脚本 + gzip 处理 + 三条规则），已预设好读取本面板的坐标。导入后在插件配置页确认三条脚本都启用，再开启 HTTPS 解密并信任 CA 证书即可。改坐标只需在地图选点锁定，无需动插件。</div>
       <div class="config-code-box" id="config-loon-url-text">...</div>
-      <button class="config-action-btn" id="btn-config-copy-loon-url">复制 Loon 配置链接</button>
+      <button class="config-action-btn" id="btn-config-copy-loon-url">复制 Loon 插件地址</button>
     </div>
     <div class="config-section" style="border-bottom:none;">
       <div id="dark-toggle">
@@ -1735,7 +1735,7 @@ function openConfigPanel() {
   // Format links
   var moduleUrl = domain + '/ios-location-spoofer.sgmodule' + (tokenVal ? '?token=' + encodeURIComponent(tokenVal) : '');
   var argText = 'configUrl=' + domain + '/loc.json' + (tokenVal ? '?token=' + encodeURIComponent(tokenVal) : '');
-  var loonUrl = domain + '/ios-location-spoofer.loon.conf' + (tokenVal ? '?token=' + encodeURIComponent(tokenVal) : '');
+  var loonUrl = domain + '/ios-location-spoofer.lnplugin';
   
   $id('config-url-text').textContent = moduleUrl;
   $id('config-arg-text').textContent = argText;
