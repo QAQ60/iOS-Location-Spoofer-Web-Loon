@@ -1,0 +1,11 @@
+name = "ios-spoofer-loon"
+pages_build_output_dir = "public"
+compatibility_date = "2026-11-01"
+
+[vars]
+TOKEN = "spoof-I551jw3iRbhnkc0H"
+AMAP_KEY = ""
+
+[[kv_namespaces]]
+binding = "SPOOFER_DATA"
+id = "c712f7a58af14ad884495eb43dc768ed"

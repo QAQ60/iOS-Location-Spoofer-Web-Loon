@@ -1028,6 +1028,12 @@ html.dark #search-results::-webkit-scrollbar-thumb {
       <div class="config-code-box" id="config-arg-text">...</div>
       <button class="config-action-btn" id="btn-config-copy-arg">复制 argument 参数</button>
     </div>
+    <div class="config-section">
+      <div class="config-title">🦉 Loon 用户（本适配版）</div>
+      <div class="config-desc">Loon 不支持小火箭的 sgmodule 格式。点击下方复制 Loon 配置链接，在 Loon 中打开后把内容导入到配置：脚本会自动远程加载改写脚本，MITM 域名也会自动加好。之后开启 Loon 的 HTTPS 解密并信任 CA 证书即可。</div>
+      <div class="config-code-box" id="config-loon-url-text">...</div>
+      <button class="config-action-btn" id="btn-config-copy-loon-url">复制 Loon 配置链接</button>
+    </div>
     <div class="config-section" style="border-bottom:none;">
       <div id="dark-toggle">
         <div id="dark-toggle-label">
@@ -1728,9 +1734,11 @@ function openConfigPanel() {
   // Format links
   var moduleUrl = domain + '/ios-location-spoofer.sgmodule' + (tokenVal ? '?token=' + encodeURIComponent(tokenVal) : '');
   var argText = 'configUrl=' + domain + '/loc.json' + (tokenVal ? '?token=' + encodeURIComponent(tokenVal) : '');
+  var loonUrl = domain + '/ios-location-spoofer.loon.conf' + (tokenVal ? '?token=' + encodeURIComponent(tokenVal) : '');
   
   $id('config-url-text').textContent = moduleUrl;
   $id('config-arg-text').textContent = argText;
+  $id('config-loon-url-text').textContent = loonUrl;
 }
 
 function closeConfigPanel() {
@@ -1761,6 +1769,12 @@ $id('btn-config-copy-url').addEventListener('click', function() {
 $id('btn-config-copy-arg').addEventListener('click', function() {
   navigator.clipboard.writeText($id('config-arg-text').textContent)
     .then(function() { toast('参数已复制'); })
+    .catch(function() { toast('复制失败，请手动选择复制'); });
+});
+
+$id('btn-config-copy-loon-url').addEventListener('click', function() {
+  navigator.clipboard.writeText($id('config-loon-url-text').textContent)
+    .then(function() { toast('Loon 配置链接已复制'); })
     .catch(function() { toast('复制失败，请手动选择复制'); });
 });
 

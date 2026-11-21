@@ -786,7 +786,10 @@
       callback(null);
       return;
     }
-    $httpClient.get({ url: url, timeout: 5 }, function (err, resp, data) {
+    // Loon 的 $httpClient timeout 单位是毫秒，Shadowrocket 是秒
+    var isLoonEnv = typeof $loon !== "undefined";
+    var httpTimeout = isLoonEnv ? 5000 : 5;
+    $httpClient.get({ url: url, timeout: httpTimeout }, function (err, resp, data) {
       if (err || !data || (resp && resp.status >= 400)) {
         callback(null);
         return;
@@ -811,6 +814,9 @@
     var scriptArgs = typeof $argument === "string" ? parseArgumentString($argument) : {};
     var config = normalizeConfig(scriptArgs);
 
+    // 判断客户端：Loon 有 $loon 全局对象，回写 body 用顶层字段；Shadowrocket 用 {response:{...}} 包裹
+    var isLoonRuntime = typeof $loon !== "undefined";
+
     function passThrough() {
       $done({});
     }
@@ -824,13 +830,12 @@
       headers["X-Location-Spoofer-Wifi"] = String(wifiCount);
       headers["X-Location-Spoofer-Cell"] = String(cellCount);
 
-      $done({
-        response: {
-          status: 200,
-          headers: headers,
-          body: bodyBytes
-        }
-      });
+      var payload = {
+        status: 200,
+        headers: headers,
+        body: bodyBytes
+      };
+      $done(isLoonRuntime ? payload : { response: payload });
     }
 
     function processRewrite(activeConfig) {
@@ -853,13 +858,12 @@
         if (activeConfig.failOpen) {
           passThrough();
         } else {
-          $done({
-            response: {
-              status: "HTTP/1.1 500 Internal Server Error",
-              headers: { "Content-Type": "text/plain" },
-              body: "Location spoofing failed: " + err.message
-            }
-          });
+          var errPayload = {
+            status: "HTTP/1.1 500 Internal Server Error",
+            headers: { "Content-Type": "text/plain" },
+            body: "Location spoofing failed: " + err.message
+          };
+          $done(isLoonRuntime ? errPayload : { response: errPayload });
         }
       }
     }
