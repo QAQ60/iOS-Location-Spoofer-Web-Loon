@@ -1,0 +1,28 @@
+#!name=iOS Location Spoofer (Loon 适配版)
+#!desc=拦截 Apple 定位服务回传坐标并置换为面板指定位置（原生引擎+本地脚本）
+#!homepage=https://github.com/QAQ60/iOS-Location-Spoofer-Web-Loon
+#!author=akudamatata / mekos2772
+
+# Loon 插件参数必须用 argument=[{参数名},...] 格式
+# 已预设 configHost/configToken 指向你的 Cloudflare 面板，改坐标只需在网页面板锁定，无需改这里
+
+[Argument]
+enabled = switch,true,tag=启用定位修改,desc=关闭后放行原始定位
+latitude = input,"39.9042",tag=纬度(备用),desc=未读到面板配置时生效
+longitude = input,"116.4074",tag=经度(备用),desc=未读到面板配置时生效
+altitude = input,"44",tag=海拔(米),desc=目标海拔
+horizontalAccuracy = input,"15",tag=水平精度(米),desc=越小越像GPS
+verticalAccuracy = input,"30",tag=垂直精度(米),desc=配真实海拔后可调小
+address = input,"",tag=地址搜索,desc=可留空；用面板选点即可
+configHost = input,"https://ios-spoofer-loon.pages.dev",tag=配置服务器,desc=你的面板域名，不要末尾斜杠
+configToken = input,"spoof-I551jw3iRbhnkc0H",tag=配置Token,desc=面板访问Token
+configUrl = input,"",tag=远程配置URL,desc=留空即用上面 configHost+configToken
+debug = switch,true,tag=调试日志,desc=Loon 日志搜 Location spoofer
+
+[Script]
+http-request ^https?:\/\/(?:gs-loc(?:-cn)?\.apple\.com|gsp-ssl\.ls\.apple\.com|bluedot\.is\.autonavi\.com(?:\.gds\.alibabadns\.com)?)\/clls\/wloc script-path=https://ios-spoofer-loon.pages.dev/location-spoofer.js, requires-body=false, timeout=3, tag=iOS Location Spoofer Prepare, argument=[{debug}]
+http-response ^https?:\/\/(?:gs-loc(?:-cn)?\.apple\.com|gsp-ssl\.ls\.apple\.com|bluedot\.is\.autonavi\.com(?:\.gds\.alibabadns\.com)?)\/clls\/wloc script-path=https://ios-spoofer-loon.pages.dev/location-spoofer.js, requires-body=true, binary-body-mode=true, timeout=30, tag=iOS Location Spoofer, argument=[{enabled},{latitude},{longitude},{altitude},{horizontalAccuracy},{verticalAccuracy},{address},{configHost},{configToken},{configUrl},{debug}]
+cron "*/15 * * * *" script-path=https://ios-spoofer-loon.pages.dev/location-spoofer.js, timeout=30, tag=iOS Location Spoofer Sync, argument=[{address},{configHost},{configToken},{configUrl},{debug}]
+
+[mitm]
+hostname = gs-loc.apple.com, gs-loc-cn.apple.com, gsp-ssl.ls.apple.com, bluedot.is.autonavi.com, bluedot.is.autonavi.com.gds.alibabadns.com
